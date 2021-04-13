@@ -4,10 +4,12 @@
 using namespace std;
 
 // fuerza bruta:
-int resistencia_tubo;
+int resistencia_tubo; // es R
 int n;
-vector<int> R; // resistencias
-vector<int> W; // pesos
+int R;
+const int INFINITO = INT_MAX;
+vector<int> r; // resistencias
+vector<int> w; // pesos
 
 vector<int> sol_parcial; // inicialmente en cero
 
@@ -129,9 +131,9 @@ void jambo_backtrakingPO(int cardinal, int peso_actual, int max_resistencia, int
        
        
 vector<vector<int>> D; // diccionario
-#define BOTTOM;
+#define BOTTOM -1
 
-jambo_PD(int i, int j){
+int jambo_PD(int i, int j){
 	if(i == 0){return 0;}
   	
   	if(D[i][j] == BOTTOM){
@@ -150,33 +152,35 @@ jambo_PD(int i, int j){
 }
 
 
+// nueva fuerza bruta
+
+// i: posicion del elemento a considerar en este nodo.
+// p: suma de los pesos de los elementos seleccionados hasta este nodo.
+// r: maxima resistencia que soportan sin romperse los elementos 
+//    seleccionados hasta este nodo. Inicialmente su valor sera la resistencia del tubo.
+// k: cantidad de elementos seleccionados hasta este nodo.
+int PJT_FB(int i, int p, int r, int k)
+{
+	// Caso base
+	if(i == n){ 
+  		if(r >= 0 and p <= R){
+        	return k;
+    	}
+    	else{
+        	return -INFINITO;
+  	 	}
+  	}
+  
+	// Recursion.
+	int agrego = PJT_FB(i+1, p+w[i], min(r-w[i], r[i]), k+1);
+	int no_agrego = PJT_FB(i+1, p, r, k); 
+	return max(agrego, no_agrego);  
+}
+
 int main(){
     cin >> n;
     sudoku.resize(n,vector<int>(n,0));
 
        
     return 0;
-}
-
-
-// nueva fuerza bruta
-int jambo_fuerza_bruta2(int cardinal, int peso_actual, int i, res_actual){ // {e_i, ..., e_n}
-	if(i == n){ // recorrio todo
-  		if(res_actual >= 0 and peso_actual <= resistencia_tubo){
-    		//max_global = cardinal;
-        	return cardinal;
-    	}
-    	else{
-        	
-        	return -INFINITO;
-    	//return;
-  	  }
-  }
-  
-  //sol_parcial[i] = 1;
-  int agrego = jambo_fuerza_bruta(cardinal+1,peso_actual+W[i],i+1, min(res_actual-w[i], r[i]));
-  //sol_parcial[i] = 0;
-  int no_agrego = jambo_fuerza_bruta(cardinal,peso_actual,i+1, res_actual); 
-    
-  return max(agrego, no_agrego);  
 }
