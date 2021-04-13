@@ -156,10 +156,10 @@ int jambo_PD(int i, int j){
 
 // i: posicion del elemento a considerar en este nodo.
 // p: suma de los pesos de los elementos seleccionados hasta este nodo.
-// r: maxima resistencia que soportan sin romperse los elementos 
+// mr: maxima resistencia que soportan sin romperse los elementos 
 //    seleccionados hasta este nodo. Inicialmente su valor sera la resistencia del tubo.
 // k: cantidad de elementos seleccionados hasta este nodo.
-int PJT_FB(int i, int p, int r, int k)
+int PJT_FB(int i, int p, int mr, int k)
 {
 	// Caso base
 	if(i == n){ 
@@ -172,7 +172,7 @@ int PJT_FB(int i, int p, int r, int k)
   	}
   
 	// Recursion.
-	int agrego = PJT_FB(i+1, p+w[i], min(r-w[i], r[i]), k+1);
+	int agrego = PJT_FB(i+1, p+w[i], min(mr-w[i], r[i]), k+1);
 	int no_agrego = PJT_FB(i+1, p, r, k); 
 	return max(agrego, no_agrego);  
 }
