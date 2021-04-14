@@ -13,7 +13,7 @@ vector<int> w; // pesos
 
 vector<int> sol_parcial; // inicialmente en cero
 
-int max_global = 0; // maxima catidad de productos que se pueden apilar 
+int max_global = 0; // Mejor solucion hasta el momento.
 
 // verifica si algun producto de la solucion parcial se aplasto.
 // devuelve true si ningun producto se aplasto
@@ -90,7 +90,40 @@ void jambo_backtrakingPF(int cardinal, int peso_actual, int max_resistencia, int
   sol_parcial[i] = 0;
   jambo_backtrakingPF(cardinal,peso_actual,max_resistencia, i+1); 
 }
+// Se juntan los 2 algoritmos de backtracking
+// i: posicion del elemento a considerar en este nodo.
+// p: suma de los pesos de los elementos seleccionados hasta este nodo.
+// mr: maxima resistencia que soportan sin romperse los elementos 
+//    seleccionados hasta este nodo. Inicialmente su valor sera la resistencia del tubo.
+// k: cantidad de elementos seleccionados hasta este nodo.
+bool poda_factibilidad = true; // define si la poda por factibilidad esta habilitada.
+bool poda_optimalidad = true; // define si la poda por optimalidad esta habilitada.
+int PJT_BT(int i, int p, int mr, int k)
+{
+	// Caso base
+	if(i == n){ 
+  		if(mr >= 0 and p <= R){
+			max_global = max(max_global, k);	  
+        	return k;
+    	}
+    	else{
+        	return -INFINITO;
+  	 	}
+  	}
+  
+	// Poda por factibilidad.
+    if(poda_factibilidad && (mr < 0 || p > R)) return -INFINITO;
 
+	// Poda por optimalidad. (vale que 0<= i < n)
+	int k2 = n - i; // cantidad de productos sin explorar 
+    if (poda_optimalidad && k + k2 <= max_global) return -INFINITO;
+
+	// Recursion.
+	int agrego = PJT_BT(i+1, p+w[i], min(mr-w[i], r[i]), k+1);
+	int no_agrego = PJT_BT(i+1, p, mr, k); 
+	return max(agrego, no_agrego);  
+}
+// PJT_BT(0,0,R,0) es la solucion al problema
 
 int max_resistencia; // inicializar el INFINITO, consultar con docente
 int cant_sin_explorar; // se inicializa en el valor n.
@@ -163,7 +196,7 @@ int PJT_FB(int i, int p, int mr, int k)
 {
 	// Caso base
 	if(i == n){ 
-  		if(r >= 0 and p <= R){
+  		if(mr >= 0 and p <= R){
         	return k;
     	}
     	else{
@@ -173,9 +206,12 @@ int PJT_FB(int i, int p, int mr, int k)
   
 	// Recursion.
 	int agrego = PJT_FB(i+1, p+w[i], min(mr-w[i], r[i]), k+1);
-	int no_agrego = PJT_FB(i+1, p, r, k); 
+	//OJO: puede ser que r[0]< mr-w[0], pero esta bien, pues si el primer producto
+	// tiene muy poca resistencia, no me va a importar que el tubo tenga R = 500
+	int no_agrego = PJT_FB(i+1, p, mr, k); 
 	return max(agrego, no_agrego);  
 }
+//PJT_FB(0,0,R,0) es la solucion al problema
 
 int main(){
     cin >> n;
