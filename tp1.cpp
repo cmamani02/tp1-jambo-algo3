@@ -165,25 +165,33 @@ void jambo_backtrakingPO(int cardinal, int peso_actual, int max_resistencia, int
        
 vector<vector<int>> D; // diccionario
 #define BOTTOM -1
+// jambo_PD(i, j): maxima cantidad de productos que se puede apilar considerando los 
+// los productos {Si, ... Sn}, cuando j es la maxima resistencia que se puede utilizar 
 
+// BORRAR: Esta maxima resistencia combina la informacion del tubo, y esta actualizada según los pasos previos.
+// configuracion nueva de los subproblemas
 int jambo_PD(int i, int j){
-	if(i == 0){return 0;}
+	if(j < 0) return -INFINITO;
+	// j >= 0:
+	if(i == n) return 0; // ya no se pueden agregar elementos
   	
   	if(D[i][j] == BOTTOM){
-  		if(j - w[i] < 0){
-    		int aux = jambo_PD(i-1,j);
-      		D[i][j] = aux;
-      	}
-    }
-    else{
-    	int caso_agrego = jambo_PD(i-1, min(j-w[i], r[i]) ) + 1;
-    	int caso_no_agrego = jambo_PD(i-1,j); 
-      	int aux = max(caso_no_agrego, caso_agrego);
-    	D[i][j] = aux; //calculo(i,j);
-  }
-  return D[i][j];
+  		//if(j - w[i] < 0){
+    	//	int aux = jambo_PD(i-1,j);
+      	//	D[i][j] = aux;
+      	//}
+    //}
+    //else{
+		// OBS: lo de arriba fue comentado: si el valor fuera negativo, 
+		// se resuelve en caso base.
+    	int caso_agrego = jambo_PD(i+1, min(j-w[i], r[i]) ) + 1;
+    	int caso_no_agrego = jambo_PD(i+1,j); 
+     	int aux = max(caso_no_agrego, caso_agrego);
+    	D[i][j] = aux;
+  	}
+  	return D[i][j];
 }
-
+// jambo_PD(0, R) es la solucion al problema
 
 // nueva fuerza bruta
 
