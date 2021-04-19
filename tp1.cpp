@@ -3,40 +3,14 @@
 
 using namespace std;
 
-// fuerza bruta:
-int resistencia_tubo; // es R
-int n;
-int R;
 const int INFINITO = INT_MAX;
+
+int n, R;
 vector<int> r; // resistencias
 vector<int> w; // pesos
 
-vector<int> sol_parcial; // inicialmente en cero
-
 int max_global = 0; // Mejor solucion hasta el momento.
 
-// poda factibilidad
-const int max_resistencia = INT_MAX; // 1e9+7 inicializar en INFINITO
-//int ans = jambo_backtrakingPF(.. ,max_resistencia);
-
-void jambo_backtrakingPF(int cardinal, int peso_actual, int max_resistencia, int i){
-  if(max_resistencia < 0 || peso_actual > resistencia_tubo){return;} //poda por factibilidad
-  
-	if(i == n){ // recorrio todo
-  	if(cardinal > max_global){
-    		max_global = cardinal;
-  	}
-    return;
-  }
-  
-  sol_parcial[i] = 1;
-  int max_resistencia_actual = min(max_resistencia-W[i],R[i]); // valor auxiliar
-  jambo_backtrakingPF(cardinal+1,peso_actual+W[i],max_resistencia_actual,i+1);
-  
-  sol_parcial[i] = 0;
-  jambo_backtrakingPF(cardinal,peso_actual,max_resistencia, i+1); 
-}
-// Se juntan los 2 algoritmos de backtracking
 // i: posicion del elemento a considerar en este nodo.
 // p: suma de los pesos de los elementos seleccionados hasta este nodo.
 // mr: maxima resistencia que soportan sin romperse los elementos 
@@ -62,38 +36,14 @@ int PJT_BT(int i, int p, int mr, int k)
 
 	// Poda por optimalidad. (vale que 0<= i < n)
 	int k2 = n - i; // cantidad de productos sin explorar 
-    if (poda_optimalidad && k + k2 <= max_global) return -INFINITO;
+    if(poda_optimalidad && k + k2 <= max_global) return -INFINITO;
 
 	// Recursion.
-	int agrego = PJT_BT(i+1, p+w[i], min(mr-w[i], r[i]), k+1);
 	int no_agrego = PJT_BT(i+1, p, mr, k); 
-	return max(agrego, no_agrego);  
+	int agrego = PJT_BT(i+1, p+w[i], min(mr-w[i], r[i]), k+1);
+	return max(no_agrego, agrego);  
 }
 // PJT_BT(0,0,R,0) es la solucion al problema
-
-int max_resistencia; // inicializar el INFINITO, consultar con docente
-int cant_sin_explorar; // se inicializa en el valor n.
-void jambo_backtrakingPO(int cardinal, int peso_actual, int max_resistencia, int cantidad_sin_explorar, int i){
-  if(max_resistencia < 0 || peso_actual > resistencia_tubo) return; //poda por factibilidad
-  
-  if(cantidad_sin_explorar + cardinal <= max_global) return; // poda por optimalidad
-  
-	if(i == n){ // recorrio todo
-  	if(cardinal > max_global){
-    		max_global = cardinal;
-  	}
-    return;
-  }
-  
-  sol_parcial[i] = 1;
-  int max_resistencia_actual = min(max_resistencia-W[i],R[i]);
-  // por que no agrege el 
-  jambo_backtrakingPO(cardinal+1,peso_actual+W[i],max_resistencia_actual,cant_sin_explorar-1,i+1);
-  
-  //no agrega el elemento, y el conjunto restante 
-  sol_parcial[i] = 0;
-  jambo_backtrakingPO(cardinal,peso_actual,max_resistencia,cant_sin_explorar-1,i+1); 
-}
   
        
 vector<vector<int>> D; // diccionario de memoizacion
