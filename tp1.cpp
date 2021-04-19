@@ -15,60 +15,6 @@ vector<int> sol_parcial; // inicialmente en cero
 
 int max_global = 0; // Mejor solucion hasta el momento.
 
-// verifica si algun producto de la solucion parcial se aplasto.
-// devuelve true si ningun producto se aplasto
-// 					false en caso contrario
-bool resistencia_valida(){
-  bool ans = true;
-  
-  int resis_actual = 0;
-  int max_resis = 0;
-  
-  // indice del primer elemento agregado
-  int index_i = n;
-  for(int i=0; i < n; i++){
-  	if(sol_parcial[i] == 1){
-    	index_i = i;
-      break;
-    } 
-  }
-  
-  if(index_i < n) {
-  	max_resis = R[index_i];
-  }
-  
-  for(int i=index_i; i < n; i++){
-    if(sol_parcial[i] == 1){
-      if(W[i] > max_resis){
-      	ans = false;
-      	break;
-      }
-      resis_actual = R[i];
-      max_resis = min(max_resis-W[i],resis_actual);
-    }
-  }
-  return ans;
-}
-
-// recorre todos los posibles subconjuntos
-//agregar que devuelva int
-
-void jambo_fuerza_bruta(int cardinal, int peso_actual, int i){ // {e_i, ..., e_n}
-	if(i == n){ // recorrio todo
-  		if(resistencia_valida() and peso_actual <= resistencia_tubo
-      	 and cardinal > max_global){
-    		max_global = cardinal;
-    	}
-    	return;
-  	}
-  
-  sol_parcial[i] = 1;
-  jambo_fuerza_bruta(cardinal+1,peso_actual+W[i],i+1);
-  sol_parcial[i] = 0;
-  jambo_fuerza_bruta(cardinal,peso_actual,i+1); 
-}
-
-//#define INT_MAX 2147483647
 // poda factibilidad
 const int max_resistencia = INT_MAX; // 1e9+7 inicializar en INFINITO
 //int ans = jambo_backtrakingPF(.. ,max_resistencia);
@@ -162,15 +108,14 @@ int PJT_PD(int i, int j){
 	if(i == n && j >= 0) return 0; // ya no se pueden agregar elementos
   	
   	if(D[i][j] == BOTTOM){
-    	int caso_no_agrego = PJT_PD(i+1,j); 
-    	int caso_agrego = PJT_PD(i+1, min(j-w[i], r[i]) ) + 1;
-    	D[i][j] = max(caso_no_agrego, caso_agrego);
+    	int no_agrego = PJT_PD(i+1,j); 
+    	int agrego = PJT_PD(i+1, min(j-w[i], r[i]) ) + 1;
+    	D[i][j] = max(no_agrego, agrego);
   	}
   	return D[i][j];
 }
 // jambo_PD(0, R) es la solucion al problema
 
-// nueva fuerza bruta
 
 // i: posicion del elemento a considerar en este nodo.
 // p: suma de los pesos de los elementos seleccionados hasta este nodo.
@@ -190,11 +135,11 @@ int PJT_FB(int i, int p, int mr, int k)
   	}
   
 	// Recursion.
+	int no_agrego = PJT_FB(i+1, p, mr, k);
 	int agrego = PJT_FB(i+1, p+w[i], min(mr-w[i], r[i]), k+1);
 	//OJO: puede ser que r[0]< mr-w[0], pero esta bien, pues si el primer producto
 	// tiene muy poca resistencia, no me va a importar que el tubo tenga R = 500
-	int no_agrego = PJT_FB(i+1, p, mr, k); 
-	return max(agrego, no_agrego);  
+	return max(no_agrego, agrego);  
 }
 //PJT_FB(0,0,R,0) es la solucion al problema
 
