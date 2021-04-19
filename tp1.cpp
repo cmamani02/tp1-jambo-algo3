@@ -148,46 +148,23 @@ void jambo_backtrakingPO(int cardinal, int peso_actual, int max_resistencia, int
   sol_parcial[i] = 0;
   jambo_backtrakingPO(cardinal,peso_actual,max_resistencia,cant_sin_explorar-1,i+1); 
 }
-
-//programacion dinamica
-
-// arranca en n y reduce
-// solucion = func(n,R)
-
-//func(i, j) = 
-//*  0                                        si i = 0
-
-//* func(i-1, j)                              si j - w[i] < 0 // vale i < n
-
-//* max{ func(i-1, j),                        caso contrario// podes agregar el i-esimo
-//			 func(i-1, min(j-w[i], r[i]) ) + 1 }
+  
        
-       
-vector<vector<int>> D; // diccionario
+vector<vector<int>> D; // diccionario de memoizacion
 #define BOTTOM -1
 // jambo_PD(i, j): maxima cantidad de productos que se puede apilar considerando los 
 // los productos {Si, ... Sn}, cuando j es la maxima resistencia que se puede utilizar 
 
 // BORRAR: Esta maxima resistencia combina la informacion del tubo, y esta actualizada según los pasos previos.
 // configuracion nueva de los subproblemas
-int jambo_PD(int i, int j){
+int PJT_PD(int i, int j){
 	if(j < 0) return -INFINITO;
-	// j >= 0:
-	if(i == n) return 0; // ya no se pueden agregar elementos
+	if(i == n && j >= 0) return 0; // ya no se pueden agregar elementos
   	
   	if(D[i][j] == BOTTOM){
-  		//if(j - w[i] < 0){
-    	//	int aux = jambo_PD(i-1,j);
-      	//	D[i][j] = aux;
-      	//}
-    //}
-    //else{
-		// OBS: lo de arriba fue comentado: si el valor fuera negativo, 
-		// se resuelve en caso base.
-    	int caso_agrego = jambo_PD(i+1, min(j-w[i], r[i]) ) + 1;
-    	int caso_no_agrego = jambo_PD(i+1,j); 
-     	int aux = max(caso_no_agrego, caso_agrego);
-    	D[i][j] = aux;
+    	int caso_no_agrego = PJT_PD(i+1,j); 
+    	int caso_agrego = PJT_PD(i+1, min(j-w[i], r[i]) ) + 1;
+    	D[i][j] = max(caso_no_agrego, caso_agrego);
   	}
   	return D[i][j];
 }
