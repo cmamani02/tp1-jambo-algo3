@@ -135,7 +135,7 @@ int main(int argc, char** argv)
 
     // Ejecutamos el algoritmo y obtenemos su tiempo de ejecución.
     int optimum;
-    optimum = INFINITO;
+    optimum = 0;
     auto start = chrono::steady_clock::now();
     if (algoritmo == "FB")
     {
@@ -176,6 +176,6 @@ int main(int argc, char** argv)
     clog << total_time << endl;
 
     // Imprimimos el resultado por stdout.
-    cout << (optimum == INFINITO ? -1 : optimum) << endl;
+    cout << optimum << endl;
     return 0;
 }
