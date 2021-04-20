@@ -19,8 +19,8 @@ int R;
 int n;
 vector<int> r; // = {45,8,15,02,30}; // resistencias
 vector<int> w; // = {10,20,30,10,15}; // pesos
-int max_global = 5; // maxima catidad de productos que se pueden apilar 
-int INFINITO = INT_MAX;
+int max_global = 0; // maxima catidad de productos que se pueden apilar 
+const int INFINITO = INT_MAX;
 /***Fueza Bruta de pura cepa****/
 // @parametros
 // i: posicion del elemento a considerar en este nodo.
@@ -35,10 +35,10 @@ int PJT_FB(int i, int p, int mr, int k){
       return -INFINITO;
   }
   // Recursion.
-  int agrego = PJT_FB(i+1, p+w[i], min(mr-w[i], r[i]), k+1);
   //OJO: puede ser que r[0]< mr-w[0], pero esta bien, pues si el primer producto
   // tiene muy poca resistencia, no me va a importar que el tubo tenga R = 500
   int no_agrego = PJT_FB(i+1, p, mr, k); 
+  int agrego = PJT_FB(i+1, p+w[i], min(mr-w[i], r[i]), k+1);
   return max(no_agrego, agrego);  
 }
 //PJT_FB(0,0,R,0) es la solucion al problema
@@ -66,8 +66,8 @@ int jambo_PD(int i, int j){
     //else{
     // OBS: lo de arriba fue comentado: si el valor fuera negativo, 
     // se resuelve en caso base.
-      int caso_agrego = jambo_PD(i+1, min(j-w[i], r[i]) ) + 1;
       int caso_no_agrego = jambo_PD(i+1,j); 
+      int caso_agrego = jambo_PD(i+1, min(j-w[i], r[i]) ) + 1;
       int aux = max(caso_no_agrego, caso_agrego);
       D[i][j] = aux;
     }
