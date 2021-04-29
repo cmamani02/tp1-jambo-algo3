@@ -14,15 +14,15 @@
 #include <map>
 using namespace std;
 
-// fuerza bruta:
+const int INFINITO = INT_MAX;
+
+// Información de la instancia a resolver.
 int R;
 int n;
-vector<int> r; // = {45,8,15,02,30}; // resistencias
-vector<int> w; // = {10,20,30,10,15}; // pesos
-int max_global = 0; // maxima catidad de productos que se pueden apilar 
-const int INFINITO = INT_MAX;
-/***Fueza Bruta de pura cepa****/
-// @parametros
+vector<int> r; // resistencias
+vector<int> w; // pesos
+
+/***Fueza Bruta***/
 // i: posicion del elemento a considerar en este nodo.
 // p: suma de los pesos de los elementos seleccionados hasta este nodo.
 // mr: maxima resistencia que soportan sin romperse los elementos 
@@ -35,26 +35,21 @@ int PJT_FB(int i, int p, int mr, int k){
         else return -INFINITO;
     }
     // Recursion.
-    //OJO: puede ser que r[0]< mr-w[0], pero esta bien, pues si el primer producto
-    // tiene muy poca resistencia, no me va a importar que el tubo tenga R = 500
     int no_agrego = PJT_FB(i+1, p, mr, k); 
     int agrego = PJT_FB(i+1, p+w[i], min(mr-w[i], r[i]), k+1);
     return max(no_agrego, agrego);  
 }
 //PJT_FB(0,0,R,0) es la solucion al problema
 
-
+/***Programacion Dinamica***/
 const int UNDEFINED = -1;
-vector<vector<int>> D; // diccionario
+vector<vector<int>> D; // Memoria de PD.
 
 // jambo_PD(i, j): maxima cantidad de productos que se puede apilar considerando los 
 // los productos {Si, ... Sn}, cuando j es la maxima resistencia que se puede utilizar 
-
-// BORRAR: Esta maxima resistencia combina la informacion del tubo, y esta actualizada según los pasos previos.
-// configuracion nueva de los subproblemas
 int jambo_PD(int i, int j){
     if(j < 0) return -INFINITO;
-    if(i == n && j >= 0) return 0; // ya no se pueden agregar elementos
+    if(i == n && j >= 0) return 0;
         
     if(D[i][j] == UNDEFINED){
         int caso_no_agrego = jambo_PD(i+1,j); 
@@ -66,9 +61,7 @@ int jambo_PD(int i, int j){
 }
 // jambo_PD(0, R) es la solucion al problema
 
-
-
-// Se juntan los 2 algoritmos de backtracking
+/***Programacion Dinamica***/
 // i: posicion del elemento a considerar en este nodo.
 // p: suma de los pesos de los elementos seleccionados hasta este nodo.
 // mr: maxima resistencia que soportan sin romperse los elementos 
@@ -76,7 +69,7 @@ int jambo_PD(int i, int j){
 // k: cantidad de elementos seleccionados hasta este nodo.
 bool poda_factibilidad; // define si la poda por factibilidad esta habilitada.
 bool poda_optimalidad; // define si la poda por optimalidad esta habilitada.
-
+int max_global = 0; // Mejor solucion hasta el momento.
 int PJT_BT(int i, int p, int mr, int k)
 {
     // Caso base
@@ -93,7 +86,7 @@ int PJT_BT(int i, int p, int mr, int k)
     // Poda por factibilidad.
     if(poda_factibilidad && (mr < 0 || p > R)) return -INFINITO;
 
-    // Poda por optimalidad. (vale que 0<= i < n)
+    // Poda por optimalidad.
     int k2 = n - i; // cantidad de productos sin explorar 
     if(poda_optimalidad && k + k2 <= max_global) return -INFINITO;
 
